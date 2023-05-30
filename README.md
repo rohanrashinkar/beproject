@@ -1,5 +1,8 @@
 # project
 
+## Python compatibility
+Py Version : 3.10.7
+
 ## Virtual Environment
 
 1. Create : py -3 -m venv env 
