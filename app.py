@@ -7,16 +7,12 @@ import sqlite3
 import secrets
 from flask import flash
 
-# import playsound
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 
 print('k')
 camera = cv2.VideoCapture(0)  # use 0 for web camera
-#  for cctv camera use rtsp://username:password@ip_address:554/user=username_password='password'_channel=channel_number_stream=0.sdp' instead of camera
-# for local webcam use cv2.VideoCapture(0)
-
 def gen_frames():  # generate frame by frame from camera
     face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     model = load_model('emotion_recognition.h5')
