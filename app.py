@@ -11,6 +11,32 @@ import json
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 
+detected_emotions = {0:'None',1:'None'}
+
+def save_emotions(emotions):
+    # Load existing data from the JSON file
+    with open('lastemotion.json', 'r') as f:
+        data = json.load(f)
+    
+    # Update the emotions in the data dictionary
+    data['emotion1'] = emotions[0]
+    data['emotion2'] = emotions[1]
+    
+    # Save the updated data back to the JSON file
+    with open('lastemotion.json', 'w') as f:
+        json.dump(data, f)
+
+def load_emotions():
+    # Load the emotions from the JSON file
+    with open('lastemotion.json', 'r') as f:
+        data = json.load(f)
+    
+    # Return the emotions as a dictionary
+    return {
+        0: data['emotion1'],
+        1: data['emotion2']
+    }
+
 print('k')
 camera = cv2.VideoCapture(0)  # use 0 for web camera
 def gen_frames():  # generate frame by frame from camera
@@ -82,16 +108,23 @@ def gen_frames():  # generate frame by frame from camera
 
                 #Drawing rectangle and showing output values on frame
                 print(predicted_emotion)
-                if (predicted_emotion=='Happy'):
-                        print('play happy song')
-                        # playsound.playsound('1.mp3', True)
-                if  (predicted_emotion=='Sad'):
-                        print('play sad song')
+                # if (predicted_emotion=='Happy'):
+                #         print('play happy song')
+                # if  (predictdetected_emotions)
+                #         print('play sad song')
+                
+                #Drawing rectangle and showing output values on frame
+                detected_emotions[0] = predicted_emotion
+                detected_emotions[1] = 'None'
+                save_emotions(detected_emotions)
+                print(detected_emotions[0] + 'This is detected text')
+
                 cv2.rectangle(frame, (x, y), (x + width, y + height),(155,155, 0),2)
                 cv2.rectangle(frame, (x-1, y+height), (x+1 + width, y + height+filled_rect_ht),
                               (155, 155, 0),cv2.FILLED)
                 cv2.putText(frame, predicted_emotion+' '+ str(probab_predicted)+'%',
                             (x, y + height+ filled_rect_ht-10), font,font_size,(255,255,255), 1, cv2.LINE_AA)
+            
      
         print(len(faces))
         if len(faces) == 2:
@@ -151,6 +184,11 @@ def gen_frames():  # generate frame by frame from camera
             if (emo[0]=='Sad') and (emo[1]=='Sad'):
                     print('Sad song')
         
+            detected_emotions[0] = emo[0]
+            detected_emotions[1] = emo[1]
+            save_emotions(detected_emotions)
+
+            print(detected_emotions[0] + ' This is detected text ' + detected_emotions[1])
 
         ret, buffer = cv2.imencode('.jpg', frame)
         
@@ -160,17 +198,56 @@ def gen_frames():  # generate frame by frame from camera
         if cv2.waitKey(1) == 27:
             break
 
+        time.sleep(1)
+
+
 @app.route('/video_feed')
 def video_feed():
     #Video streaming route. Put this in the src attribute of an img tag
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+def Recommended_playlist():
+    with open('emotion.json') as f:
+        playlist_data = json.load(f)
+    
+    playlist = playlist_data['playlists']
+    
+    last_emotions = load_emotions()
+
+    output = 'Neutral'
+    playlist_id = None
+
+    if (last_emotions[0] == 'None') and (last_emotions[1] == 'None'):
+        print("Nothing to do here")
+    elif (last_emotions[0] != 'None') and (last_emotions[1] == 'None'):
+        output = last_emotions[0]
+    elif (last_emotions[0] != 'None') and (last_emotions[1] != 'None'):
+        emo0 = last_emotions[0]
+        emo1 = last_emotions[1]
+        if (emo0 == 'Happy' and emo1 == 'Happy'):
+            output = 'Happy'
+        elif (emo0 == 'Happy' and emo1 == 'Sad'):
+            output = 'Neutral'
+        elif (emo0 == 'Sad' and emo1 == 'Happy'):
+            output = 'Neutral'
+        elif (emo0 == 'Sad' and emo1 == 'Sad'):
+            output = 'Sad'
+        else:
+            output = 'Neutral'
+
+    for item in playlist:
+        if item['emotion'] == output:
+            playlist_id = item['id']
+
+    return playlist_id
+
+
+
+print("This is the :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + Recommended_playlist())
 
 @app.route('/home')
 def home():
-    with open('emotion.json') as f:
-        playlist_data = json.load(f)
-    return render_template('home.html', playlists=playlist_data['playlists'])
+    return render_template('home.html', playlist=Recommended_playlist())
 
 
 @app.route('/')

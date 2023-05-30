@@ -2,27 +2,27 @@
   "playlists": [
     {
       "id": "32n8jCZ9Gna7duk7kEnb4d",
-      "emotion": "sad"
+      "emotion": "Sad"
     },
     {
       "id": "14aX2NgBk6ffo5L3C76gbX",
-      "emotion": "happy"
+      "emotion": "Happy"
     },
     {
       "id": "4PFwZ4h1LMAOwdwXqvSYHd",
-      "emotion": "neutral"
+      "emotion": "Neutral"
     },
     {
       "id": "4HHkBOG29PNN72aohVoQuF",
-      "emotion": "angry"
+      "emotion": "Angry"
     },
     {
       "id": "34WKSn1uF8nXC6TmSd4BSt",
-      "emotion": "fearful"
+      "emotion": "Fearful"
     },
     {
       "id": "5uOsYdcitGfkodNV6vaOe5",
-      "emotion": "surprised"
+      "emotion": "Surprised"
     }
   ]
 }
