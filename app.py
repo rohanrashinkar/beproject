@@ -6,7 +6,7 @@ import time
 import sqlite3
 import secrets
 from flask import flash
-
+import json
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -168,8 +168,10 @@ def video_feed():
 
 @app.route('/home')
 def home():
-    """Video streaming home page."""
-    return render_template('home.html')
+    with open('emotion.json') as f:
+        playlist_data = json.load(f)
+    return render_template('home.html', playlists=playlist_data['playlists'])
+
 
 @app.route('/')
 def index():
